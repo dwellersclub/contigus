@@ -1,0 +1,48 @@
+{
+    "name": "contigus-install",
+    "version": "0.1.0",
+    "description": "Contigus UI",
+    "main": "src/main.js",
+    "repository": "github:dwellersclub/contigus",
+    "scripts": {
+        "build": "rollup -c",
+        "watch": "rollup -c -w",
+        "test": "jest",
+        "watch:test": "jest --watch"
+    },
+    "author": "Serge Tan Panza",
+    "license": "MPL-2.0",
+    "devDependencies": {
+        "@babel/core": "^7.10.5",
+        "@babel/plugin-proposal-class-properties": "^7.10.4",
+        "@babel/plugin-proposal-decorators": "^7.10.5",
+        "@rollup/plugin-babel": "^5.1.0",
+        "@rollup/plugin-commonjs": "^14.0.0",
+        "@rollup/plugin-html": "^0.2.0",
+        "@rollup/plugin-image": "^2.0.5",
+        "@rollup/plugin-json": "^4.1.0",
+        "@rollup/plugin-node-resolve": "^8.4.0",
+        "babel-eslint": "^10.1.0",
+        "eslint": "^7.5.0",
+        "jest": "^25.0.0",
+        "jest-fetch-mock": "^1.7.4",
+        "jest-junit": "^8.0.0",
+        "messageformat": "2.3.0",
+        "messageformat-loader": "0.8.1",
+        "prettier": "^2.0.5",
+        "rollup": "^2.22.1",
+        "rollup-plugin-babel": "^4.4.0",
+        "rollup-plugin-commonjs": "^10.1.0",
+        "rollup-plugin-node-resolve": "^5.2.0",
+        "rollup-plugin-sass": "^1.2.2",
+        "rollup-plugin-terser": "^6.1.0"
+    },
+    "dependencies": {
+        "immer": "5.1.0",
+        "approvejs": "^3.1.2",
+        "comlink": "4.2.0",
+        "lit-element": "^2.3.1",
+        "universal-router": "^8.3.0",
+        "uuid": "3.3.3"
+    }
+}

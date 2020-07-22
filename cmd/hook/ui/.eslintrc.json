@@ -1,0 +1,32 @@
+{
+  "env": {
+      "browser": true,
+      "es6": true
+  },
+  "extends": "standard-jsx",
+  "globals": {
+      "Atomics": "readonly",
+      "SharedArrayBuffer": "readonly"
+  },
+  "parser": "babel-eslint",
+  "parserOptions": {
+      "ecmaFeatures": {
+          "experimentalObjectRestSpread": true,
+          "classes": true,
+          "jsx": true
+      },
+      "ecmaVersion": 8,
+      "sourceType": "module"
+  },
+  "plugins": [],
+  "settings": {
+    "react": {
+      "pragma": "h"
+    }
+  },
+  "rules": {
+    "jsx-quotes": [
+        "error",
+        "prefer-double"
+    ]}
+}
