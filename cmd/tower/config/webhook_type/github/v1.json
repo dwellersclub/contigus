@@ -1,0 +1,6 @@
+{
+  "auth" : [
+    {"type": "token", "field" : { "name": "", "type": "password", "encrypt": true}},
+    {"type": "oauth", "link": ""}
+  ]
+}

@@ -27,7 +27,7 @@ import (
 
 //ServerConfig Config for our http server
 type ServerConfig struct {
-	Port           int    `env:"PORT" envDefault:"8080"`
+	Port           int    `env:"PORT"`
 	Bind           string `env:"BIND" envDefault:"0.0.0.0"`
 	ServiceAccount string `env:"SERVICE_ACCOUNT_PATH"`
 	AllowedOrigins string `env:"CORS_ALLOWED_ORIGIN"`
@@ -35,6 +35,10 @@ type ServerConfig struct {
 	SSLCert        string `env:"SSL_CERT"`
 	SSLCA          string `env:"SSL_CA"`
 	SSLKey         string `env:"SSL_KEY"`
+
+	DBUsername string `env:"DB_USERNAME" envDefault:"postgres"`
+	DBPassword string `env:"DB_PASSWORD" envDefault:"eSbpCQ8pS5x33bi"`
+	DBURL      string `env:"DB_URL"  envDefault:"postgres|postgresql://[username]:[password]@localhost/contigus?connect_timeout=10&application_name=[appname]&sslmode=disable"`
 }
 
 //VersionInfo Version details
@@ -87,7 +91,7 @@ func StartServer(serverConfig ServerConfig, appName string, module string, route
 		options = []handlers.CORSOption{
 			handlers.AllowCredentials(),
 			handlers.AllowedMethods([]string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"}),
-			handlers.AllowedHeaders([]string{"Content-Type", "X-DW-CLIENT-ID"}),
+			handlers.AllowedHeaders([]string{"Content-Type", "X-CLIENT-ID", "X-Request-ID"}),
 			handlers.AllowedOrigins(strings.Split(serverConfig.AllowedOrigins, ",")),
 			handlers.MaxAge(600),
 		}

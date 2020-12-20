@@ -1,0 +1,10 @@
+DROP TABLE IF EXISTS webhook_handler_config_version
+DROP TABLE IF EXISTS webhook_handler_config
+DROP TABLE IF EXISTS webhook_handler;
+DROP TABLE IF EXISTS webhook_handler_type;
+DROP TABLE IF EXISTS webhook_config_version;
+DROP TABLE IF EXISTS webhook_config;
+DROP TABLE IF EXISTS webhook;
+DROP TABLE IF EXISTS webhook_type;
+DROP TABLE IF EXISTS application;
+DROP TABLE IF EXISTS project;
