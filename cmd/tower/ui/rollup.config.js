@@ -1,44 +1,56 @@
-import babel from '@rollup/plugin-babel'
+
+import resolve from '@rollup/plugin-node-resolve';
 import postcss from 'rollup-plugin-postcss'
-const html  = require('@rollup/plugin-html')
+import path from 'path';
+import babel from '@rollup/plugin-babel'
+import copy from 'rollup-plugin-copy-watch';
+import minifyHTML from 'rollup-plugin-minify-html-literals';
+import cssnano from 'cssnano';
+import cssImport from 'postcss-import';
+import purgecss from '@fullhuman/postcss-purgecss';
+
 import image from '@rollup/plugin-image';
 import json from '@rollup/plugin-json'
-import { nodeResolve } from '@rollup/plugin-node-resolve';
+import injectProcessEnv from 'rollup-plugin-inject-process-env';
 import commonjs from '@rollup/plugin-commonjs';
 import { terser } from "rollup-plugin-terser";
 
+const production = !process.env.ROLLUP_WATCH;
+
 export default {
-  input: 'src/main.js',
-  output: [
-    { file: "dist/bundle.js", format: "cjs" },
-    { file: "dist/bundle.min.js", format: "cjs", plugins: [terser()] },
-    { file: "dist/bundle.esm.js", format: "esm" },
-  ],
+  input: ["src/index.js", "src/apps/inventory/inventory.js"],
+  output: { dir: 'dist', format: 'es', sourcemap: true },
   plugins: [
-     nodeResolve(), 
-     postcss({
-        extract: true,
-        extract: 'bundle.css',
-        plugins: []
-      }), 
-     babel({ 
+    minifyHTML(),
+    copy({
+      watch: production ? null : ['src/**/*.html'],
+      targets: [
+        { src: 'node_modules/@cds/city/Webfonts', dest: 'dist' },
+        { src: 'src/index.html', dest: 'dist' },
+      ],
+    }), babel({ 
       exclude: 'node_modules/**',
-      babelHelpers: 'bundled' 
+      babelHelpers: 'bundled',
      }), 
+    postcss({
+      extract: true,
+      extract: path.resolve('dist/index.css'),
+      plugins: [
+        cssImport(),
+        production &&
+          purgecss({
+            content: ['./src/**/*.html'],
+            variables: true,
+            // custom matcher to better find Clarity utilities with cds-text and cds-layout
+            defaultExtractor: content => content.match(/[\w-\/:@]+(?<!:)/g) || [],
+          }),
+        cssnano(),
+      ],
+    }),
+     resolve(), 
+     production && terser({ output: { comments: false } }),
      commonjs(), 
-     html({
-      meta: [
-        { charset: 'utf-8' },
-        { name: 'viewport', content: 'minimum-scale=1, initial-scale=1, width=device-width' },
-        { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' },
-        { name: 'apple-mobile-web-app-capable', content: 'yes' },
-        { name: 'mobile-web-app-capable', content: 'yes' },
-        { name: 'HandheldFriendly', content: 'True' },
-        { name: 'MobileOptimized', content: '320' },
-        { name: 'robots', content: 'noindex,nofollow,noarchive' },
-        { name: 'X-UA-Compatible', content: 'ie=edge' },
-        { name: 'description', content: '' },
-        { name: 'title', content: '' }
-      ]
-     }), image(), json()],
+     injectProcessEnv({ 
+          NODE_ENV: 'production'
+      }), image(), json()],
 }

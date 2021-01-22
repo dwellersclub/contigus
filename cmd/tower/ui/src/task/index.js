@@ -1,8 +1,8 @@
 
 import { getMethods, combineReducers } from '../tools'
-import { LocalService,  LocalServiceReducer} from './service'
+import { LocalService,  LocalServiceReducer , LayoutReducer, LayoutService} from './service'
 
-const allServices = [new LocalService()]
+const allServices = [new LocalService(), new LayoutService()]
 
 const methods = allServices.reduce((items, currentService) => {
   Object.assign( items, getMethods(currentService))
@@ -21,4 +21,4 @@ export const actions = {
   }
 }
 
-export const actionReducers = combineReducers([new LocalServiceReducer()])
+export const actionReducers = combineReducers([new LocalServiceReducer(), new LayoutReducer()])

@@ -10,17 +10,11 @@ export const createRoutes = (onPathChanged, isAnonymous, routers = [], config = 
     throw new TypeError('Invalid routes')
   }
 
-  const routes = {}
-
   const loginPath = config.loginPath || '/signin'
   const errorHandler = config.errorHandler || ((error, context) => {
     console.error(error, context)
     return error.status === 404 ? NotFoundUI(context.pathname) : ErrorUI
   })
-
-  routers.forEach((router) =>  router(routes, actions))
-
-  const appRoutes = BuildRoutes(routes)
 
   const options = {
     resolveRoute(context, params) {
@@ -53,7 +47,20 @@ export const createRoutes = (onPathChanged, isAnonymous, routers = [], config = 
     errorHandler
   }
 
-  return new UniversalRouter(appRoutes, options)
+  const router = new UniversalRouter([], options)
+
+  const routes = {}
+
+  const addRoutes = (routes) => BuildRoutes(routes).forEach((item) => {
+    console.log('Adding route ', item.path)
+    router.root.children.push(item)
+  })
+
+  routers.forEach((setupHandler) =>  setupHandler({addRoutes}))
+
+  addRoutes(routes)
+
+  return  router
 }
 
 function BuildRoutes(routes) {
