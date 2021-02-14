@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
 )
@@ -38,10 +39,10 @@ func NewDB(dbURL string, maxIdle int, maxOpen int, ttl int, waitTime int64) *sql
 		db.SetMaxOpenConns(maxOpen)
 		db.SetConnMaxLifetime(time.Minute * time.Duration(ttl))
 
-		var now time.Time
-		err := db.QueryRow("SELECT NOW()").Scan(&now)
+		var now bool
+		err := db.QueryRow("SELECT 1=1").Scan(&now)
 
-		if err == nil && !now.IsZero() {
+		if err == nil && now {
 
 			if waitTime > 10 {
 				opts := prometheus.GaugeOpts{Name: "pool_connection_total", Help: "Number of db connection", Namespace: "marky", Subsystem: "db"}

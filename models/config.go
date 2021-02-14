@@ -1,8 +1,39 @@
 package models
 
+import (
+	"encoding/json"
+	"fmt"
+	"time"
+)
+
+//UUID UUID v4
+type UUID string
+
 //HookConfig configuration for hooks
 type HookConfig struct {
-	URLContext string
+	Active      bool                       `json:"active"`
+	Deleted     bool                       `json:"deleted"`
+	IndexFields bool                       `json:"indexFields"`
+	ID          UUID                       `json:"id"`
+	Name        string                     `json:"name"`
+	Type        string                     `json:"type"`
+	URLContext  string                     `json:"urlContext"`
+	Metas       map[string]json.RawMessage `json:"metas"`
+	Date        time.Time                  `json:"-"`
+}
+
+//Validate validates required values for a hook
+func (hc *HookConfig) Validate() error {
+	if len(hc.Type) == 0 {
+		return fmt.Errorf("type is required")
+	}
+	if len(hc.URLContext) == 0 {
+		return fmt.Errorf("url context is required")
+	}
+	if len(hc.ID) == 0 {
+		return fmt.Errorf("ID is required")
+	}
+	return nil
 }
 
 //SetupConfig setup configuration

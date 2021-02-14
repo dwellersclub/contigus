@@ -1,6 +1,14 @@
 {
-  "auth" : [
-    {"type": "token", "field" : { "name": "", "type": "password", "encrypt": true}},
-    {"type": "oauth", "link": ""}
-  ]
+  "active": false,
+  "deleted": false,
+  "indexFields": true,
+  "id": "6018d96b-48bf-420c-9f1f-628556eae6c1",
+  "type": "github",
+  "urlContext":"/",
+  "metas" : {
+    "fields" : [
+      {"type": "token", "field" : { "name": "", "type": "password", "encrypt": true}},
+      {"type": "oauth", "link": ""}
+    ]
+  }
 }

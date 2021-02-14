@@ -15,7 +15,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/NYTimes/gziphandler"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus"
@@ -36,9 +35,18 @@ type ServerConfig struct {
 	SSLCA          string `env:"SSL_CA"`
 	SSLKey         string `env:"SSL_KEY"`
 
-	DBUsername string `env:"DB_USERNAME" envDefault:"postgres"`
-	DBPassword string `env:"DB_PASSWORD" envDefault:"eSbpCQ8pS5x33bi"`
-	DBURL      string `env:"DB_URL"  envDefault:"postgres|postgresql://[username]:[password]@localhost/contigus?connect_timeout=10&application_name=[appname]&sslmode=disable"`
+	DBUsername string `env:"DB_USERNAME"`
+	DBPassword string `env:"DB_PASSWORD"`
+	DBURL      string `env:"DB_URL"  envDefault:"sqlite3|file:test.db?cache=shared&mode=memory"`
+}
+
+//HookServerConfig Server config for hooks
+type HookServerConfig struct {
+	ServerConfig
+	IDs         string `env:"HOOK_IDS"`
+	Context     string `env:"HOOK_CTX"`
+	ConfigPath  string `env:"HOOK_CONFIG_PATH" envDefault:"../tower/config"`
+	RefreshFreq int64  `env:"HOOK_REFRESH_FREQ" envDefault:"60"`
 }
 
 //VersionInfo Version details
@@ -207,41 +215,6 @@ type URLHandler struct {
 //NewURLHandler Create a new Handler
 func NewURLHandler(path string, handler http.HandlerFunc, secure bool, methods []string, gzip bool, roles ...string) *URLHandler {
 	return &URLHandler{path: path, handler: handler, secure: secure, methods: methods, gzip: gzip, roles: roles}
-}
-
-//InitRouter Initialise a router base on URLS configs
-func InitRouter(urls []*URLHandler, authFilter AuthFilterFunc, rawLogger *logrus.Logger) *mux.Router {
-	router := mux.NewRouter()
-	for i := 0; i < len(urls); i++ {
-		urlConfig := urls[i]
-		handler := urlConfig.handler
-		if authFilter != nil {
-			handler = authFilter(handler, rawLogger, urlConfig.secure, urlConfig.roles...)
-		}
-
-		logger := rawLogger.WithFields(logrus.Fields{
-			"secured": urlConfig.secure,
-			"methods": urlConfig.methods,
-			"path":    urlConfig.path,
-			"gzip":    urlConfig.gzip,
-		})
-
-		wrappedHandler := applyMetrics(logRequest(handler, logger), urlConfig.path)
-
-		if urlConfig.gzip {
-			wrappedHandler = gziphandler.GzipHandler(wrappedHandler)
-		}
-
-		if len(urlConfig.methods) > 0 {
-			router.Handle(urlConfig.path, wrappedHandler).Methods(urlConfig.methods...)
-		} else {
-			router.PathPrefix(urlConfig.path).Handler(wrappedHandler)
-		}
-
-		logger.Debug("Path configured")
-	}
-
-	return router
 }
 
 func applyMetrics(handler http.Handler, name string) http.Handler {

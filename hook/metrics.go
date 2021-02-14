@@ -12,7 +12,7 @@ import (
 
 //Metrics Metrics for hooks
 type Metrics interface {
-	IncHandled(hookType string, errorCode string, elapseTime time.Duration)
+	IncHandled(hookType string, ID string, errorCode string, elapseTime time.Duration)
 }
 
 // NewHookMetrics Creates a new metrics for hooks
@@ -47,7 +47,7 @@ func NewHookMetrics() Metrics {
 		Name:       "request_duration_seconds",
 		Help:       "Time taken to handle a hook",
 		Objectives: map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001},
-	}, []string{"type"})
+	}, []string{"type", "id"})
 
 	return &hookPrometheusMetrics{
 		requestTotal: requestTotal,
@@ -61,7 +61,7 @@ type hookPrometheusMetrics struct {
 	duration     *prometheus.SummaryVec
 }
 
-func (hp *hookPrometheusMetrics) IncHandled(hookType string, errorCode string, elapseTime time.Duration) {
+func (hp *hookPrometheusMetrics) IncHandled(hookType string, ID string, errorCode string, elapseTime time.Duration) {
 	key := fmt.Sprintf("%s_%s", hookType, errorCode)
 	counter, ok := hp.requestTotal[key]
 	if !ok {
@@ -72,6 +72,6 @@ func (hp *hookPrometheusMetrics) IncHandled(hookType string, errorCode string, e
 	counter.Inc()
 
 	if len(errorCode) == 0 {
-		hp.duration.WithLabelValues(hookType).Observe(elapseTime.Seconds())
+		hp.duration.WithLabelValues(hookType, ID).Observe(elapseTime.Seconds())
 	}
 }
