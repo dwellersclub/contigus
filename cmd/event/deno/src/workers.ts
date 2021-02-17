@@ -108,5 +108,9 @@ self.onmessage = async (e: MessageEvent) => {
         setTimeout(() => self.close(), 1000)
       }
       break
+    case 'new_event':
+      logger.info(`process event ${e.data.args.event}`)
+      //check concatenation of {subject}.{eventType} to dispatch to corresponding worker
+      break
   }
 };
