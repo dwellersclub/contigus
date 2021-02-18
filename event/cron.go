@@ -6,6 +6,6 @@ import (
 
 var cronEventCmd = &cobra.Command{
 	Use:   "cronEvent",
-	Short: "Start a event listener for cronEvent",
+	Short: "Start an event listener for cronEvent",
 	Run:   func(cmd *cobra.Command, args []string) {},
 }

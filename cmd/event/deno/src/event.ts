@@ -1,4 +1,8 @@
 
-export class EventReference {}
+export class EventReference {
+    id?: string
+    source?: string
+    type?: string
+}
 
-export type EventHandler = (evt: EventReference) => void;
+export type EventHandler = (evt: string) => void;

@@ -19,11 +19,19 @@ func init() {
 		ampqCmd, awssqsCmd, azureEventCmd,
 		cronEventCmd, pubSubEventCmd, kafkaEventCmd,
 		minioEventCmd, mqttEventCmd, natsEventCmd,
-		nsqEventCmd, redisEventCmd, fileEventCmd, routingEventCmd,
+		nsqEventCmd, redisEventCmd, fileEventCmd,
 	}
 
 	for _, comd := range comds {
 		rootCmd.AddCommand(comd)
 	}
 
+}
+
+type baseEventListener struct{}
+
+type baseEventSource struct{}
+
+func (bes *baseEventSource) Forward() error {
+	return nil
 }

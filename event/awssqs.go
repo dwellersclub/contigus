@@ -6,6 +6,6 @@ import (
 
 var awssqsCmd = &cobra.Command{
 	Use:   "awssqs",
-	Short: "Start a event listener for awssqs",
+	Short: "Start an event listener for awssqs",
 	Run:   func(cmd *cobra.Command, args []string) {},
 }

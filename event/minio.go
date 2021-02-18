@@ -6,6 +6,6 @@ import (
 
 var minioEventCmd = &cobra.Command{
 	Use:   "minioEvent",
-	Short: "Start a event listener for minioEvent",
+	Short: "Start an event listener for minioEvent",
 	Run:   func(cmd *cobra.Command, args []string) {},
 }

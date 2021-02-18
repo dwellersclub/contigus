@@ -1,15 +1,44 @@
-export class RoutingConfig {}
+import { EventReference } from "./event.ts";
+import { logger } from "./logger.ts";
 
-export class BaseWorker {}
+export class Listener {
+  id?: string;
+  glob?: string;
+}
 
-export class Worker extends BaseWorker {
-  
-  start(filePath: string): void {
-    console.log(filePath)
+export class BaseWorker {
+  private id: string;
+  private listeners: Map<string, Listener>;
+
+  constructor(id: string){
+    this.id = id;
+    this.listeners = new Map<string, Listener>();
   }
 
-  listen(): void {
+  compile(filePath: string): string {
+    return ""
+  }
+
+  run(id: string): void {
     console.log('listening')
+  }
+
+  match(event: EventReference): boolean {
+    logger.info("matching", event)
+    return true
+  }
+
+  process(event: EventReference): void {
+    logger.info("process", event)
+    return
+  }
+
+  addListener(glob: string): string {
+    return ""
+  }
+
+  clearListeners(): void {
+    this.listeners.clear()
   }
 
 }

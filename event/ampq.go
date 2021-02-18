@@ -6,6 +6,6 @@ import (
 
 var ampqCmd = &cobra.Command{
 	Use:   "ampq",
-	Short: "Start a event listener for ampq",
+	Short: "Start an event listener for ampq",
 	Run:   func(cmd *cobra.Command, args []string) {},
 }

@@ -9,6 +9,7 @@ import {
 import { EventReference } from "./event.ts";
 import { BaseWorker } from "./worker.ts";
 import { logger } from "./logger.ts";
+import { Events } from "./repository.ts";
 
 export interface BaseWorkers {
   dispatch(event: EventReference): void;
@@ -22,12 +23,22 @@ export class Workers {
   private port: string;
   private password: string;
   private server: Server;
+  private builderPath: string;
+  private processes: Map<string, BaseWorker>;
 
   constructor(host: string, port: string) {
     this.password = randomChars(35);
     this.host = host;
     this.port = port;
-    this.server = serve(`${this.host}:${this.port}`)
+    this.builderPath = "./tmp_builder";
+    this.processes = new Map<string, BaseWorker>();
+
+    this.getProcess = this.getProcess.bind(this);
+    this.install = this.install.bind(this);
+    this.deploy = this.deploy.bind(this);
+    this.dispatch = this.dispatch.bind(this);
+
+    this.server = serve(`${this.host}:${this.port}`);
   }
 
   async start(): Promise<void> {
@@ -53,10 +64,51 @@ export class Workers {
     const endpoint = `ws://${this.host}:${this.port}`;
     try {
       const webSocket = new WebSocket(endpoint);
-      webSocket.addEventListener('open', () => webSocket.send(`close|${this.password}`));
+      webSocket.addEventListener(
+        "open",
+        () => webSocket.send(`close|${this.password}`),
+      );
     } catch (err) {
       logger.error(`failed to connect to websocket: ${err}`);
     }
+  }
+
+  getProcess(id: string): BaseWorker | undefined {
+    return this.processes.get(id);
+  }
+
+  deploy(): void {
+    return
+  }
+
+  dispatch(event: EventReference): void {
+
+    let processed = 0;
+
+    this.processes.forEach((worker: BaseWorker) => {
+      if(worker.match(event)){
+        worker.process(event)
+        processed++
+      }
+    });
+
+    if (processed === 0){
+      logger.warn(`event ${event.id} not processed`)
+    }
+
+    return
+  }
+
+  install(event: EventReference): void {
+    logger.info(event)
+
+    // get install event
+    /*
+      Events.get(event.id).then( (item) => {
+        console.log(item.data)
+      })
+    */
+    return 
   }
 
   async handleWs(sock: WebSocket): Promise<void> {
@@ -94,23 +146,32 @@ const randomChars = (n: number) =>
     return Math.ceil(Math.random() * 35 + elt).toString(36);
   }).join("");
 
-let workers: Workers = new Workers("", "")
+let workers: Workers = new Workers("", "");
 
 self.onmessage = async (e: MessageEvent) => {
-  switch(e.data.action) {
-    case 'start':
-      workers = new Workers(e.data.args.host, e.data.args.port)
-      workers.start()
-      break
-    case 'stop':
-      if(workers){
-        workers.stop()
-        setTimeout(() => self.close(), 1000)
+  switch (e.data.action) {
+    case "start":
+      workers = new Workers(e.data.args.host, e.data.args.port);
+      workers.start();
+      break;
+    case "stop":
+      if (workers) {
+        workers.stop();
+        setTimeout(() => self.close(), 1000);
       }
-      break
-    case 'new_event':
-      logger.info(`process event ${e.data.args.event}`)
-      //check concatenation of {subject}.{eventType} to dispatch to corresponding worker
-      break
+      break;
+    case "new_event":
+      const { event } = e.data.args;
+      try {
+        const currentEvent: EventReference = JSON.parse(event)
+        if(currentEvent.type == "system"){
+          workers.install(currentEvent)
+        } else {
+          workers.dispatch(currentEvent)
+        }
+      } catch(err) {
+        logger.error(`failed to parse event: ${err}`);
+      }
+      break;
   }
 };

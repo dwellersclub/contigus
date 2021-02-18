@@ -6,6 +6,6 @@ import (
 
 var azureEventCmd = &cobra.Command{
 	Use:   "azureEvent",
-	Short: "Start a event listener for azureEvent",
+	Short: "Start an event listener for azureEvent",
 	Run:   func(cmd *cobra.Command, args []string) {},
 }
