@@ -16,10 +16,6 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
 	"github.com/sirupsen/logrus"
-
-	logging "github.com/stanpanza/marky/log"
-	"github.com/stanpanza/marky/models"
-	"github.com/stanpanza/marky/utils" //importing postgres driver
 )
 
 // NewPostgresRepository Creates a new content/listing repository
@@ -1029,7 +1025,7 @@ func (pgr *PostgresRepository) LinkSiteToOrg(orgID string, siteCodes []string) e
 	}
 	defer tx.Rollback()
 
-	stmt,err := tx.Prepare(` INSERT INTO site_organisation (site_code, org_id, created) VALUES ($1,$2,$3) `)
+	stmt, err := tx.Prepare(` INSERT INTO site_organisation (site_code, org_id, created) VALUES ($1,$2,$3) `)
 	if err == nil {
 		defer stmt.Close()
 		for _, siteCode := range siteCodes {
@@ -1053,7 +1049,7 @@ func (pgr *PostgresRepository) UnLinkSiteToOrg(orgID string, siteCodes []string)
 	}
 	defer tx.Rollback()
 
-	stmt,err := tx.Prepare(`DELETE FROM site_organisation WHERE site_code = $1 AND org_id=$2`)
+	stmt, err := tx.Prepare(`DELETE FROM site_organisation WHERE site_code = $1 AND org_id=$2`)
 	if err == nil {
 		defer stmt.Close()
 		for _, siteCode := range siteCodes {
