@@ -6,6 +6,6 @@ import (
 
 var mqttEventCmd = &cobra.Command{
 	Use:   "mqttEvent",
-	Short: "Start a event listener for mqttEvent",
+	Short: "Start an event listener for mqttEvent",
 	Run:   func(cmd *cobra.Command, args []string) {},
 }

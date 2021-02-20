@@ -34,16 +34,16 @@ export class Consumer {
     const pad = "".padEnd(p);
     for await (const m of s) {
       // respond returns true if the message had a reply subject, thus it could respond
-      onEvent(sc.decode(m.data))
-      if (m.respond(m.data)) {
-        logger.info(
-          `[${name}]:${pad} #${s.getProcessed()} echoed ${sc.decode(m.data)}`,
-        );
-      } else {
-        logger.info(
-          `[${name}]:${pad} #${s.getProcessed()} ignoring request - no reply subject`,
-        );
-      }
+        onEvent(sc.decode(m.data))
+        if (m.respond(m.data)) {
+          logger.info(
+            `[${name}]:${pad} #${s.getProcessed()} echoed ${sc.decode(m.data)}`,
+          );
+        } else {
+          logger.info(
+            `[${name}]:${pad} #${s.getProcessed()} ignoring request - no reply subject`,
+          );
+        }
     }
   }
 }

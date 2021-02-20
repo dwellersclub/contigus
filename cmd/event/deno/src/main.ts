@@ -3,7 +3,13 @@ import { logger } from "./logger.ts";
 import { EventHandler } from "./event.ts";
 import { Consumer } from "./message.ts";
 
+try {
+    
 const workers = new Worker(new URL("./workers.ts", import.meta.url).href, { type: "module", deno: true });
+workers.onerror = (e: ErrorEvent) => { 
+    e.preventDefault()
+    console.error(e.message) 
+}
 
 const handler = (e: Event) => {
     logger.info(`got ${e.type} event in event handler (main)`)
@@ -39,3 +45,6 @@ window.onunload = (e: Event): void => {
 };
 
 logger.info("log from main script");
+} catch (error) {
+    logger.error(error)
+}

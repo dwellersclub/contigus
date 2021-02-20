@@ -19,7 +19,7 @@ func init() {
 		ampqCmd, awssqsCmd, azureEventCmd,
 		cronEventCmd, pubSubEventCmd, kafkaEventCmd,
 		minioEventCmd, mqttEventCmd, natsEventCmd,
-		nsqEventCmd, redisEventCmd, fileEventCmd,
+		nsqEventCmd, redisEventCmd, fileEventCmd, bridgeCmd,
 	}
 
 	for _, comd := range comds {

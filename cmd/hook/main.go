@@ -22,7 +22,7 @@ func main() {
 	var appName = "hook"
 
 	config := utils.HookServerConfig{
-		ServerConfig: utils.ServerConfig{
+		ServerConfig: &utils.ServerConfig{
 			Port: 8081,
 		},
 	}
@@ -44,7 +44,7 @@ func main() {
 
 	router := hook.NewRouter(log, service, config, nil)
 
-	utils.StartServer(config.ServerConfig, "contigus", appName, router.Build(),
+	utils.StartServer(*config.ServerConfig, "contigus", appName, router.Build(),
 		utils.VersionInfo{
 			Version:    version,
 			Buildstamp: buildstamp,

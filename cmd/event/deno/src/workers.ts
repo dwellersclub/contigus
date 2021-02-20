@@ -6,6 +6,8 @@ import {
   WebSocket,
 } from "https://deno.land/std/ws/mod.ts";
 
+import { ensureDirSync } from "https://deno.land/std/fs/mod.ts";
+
 import { EventReference } from "./event.ts";
 import { BaseWorker } from "./worker.ts";
 import { logger } from "./logger.ts";
@@ -34,6 +36,7 @@ export class Workers {
     this.processes = new Map<string, BaseWorker>();
 
     this.getProcess = this.getProcess.bind(this);
+    this.addProcess = this.addProcess.bind(this);
     this.install = this.install.bind(this);
     this.deploy = this.deploy.bind(this);
     this.dispatch = this.dispatch.bind(this);
@@ -77,6 +80,10 @@ export class Workers {
     return this.processes.get(id);
   }
 
+  addProcess(id: string, proc: BaseWorker): void{
+    this.processes.set(id, proc);
+  }
+
   deploy(): void {
     return
   }
@@ -86,8 +93,9 @@ export class Workers {
     let processed = 0;
 
     this.processes.forEach((worker: BaseWorker) => {
-      if(worker.match(event)){
-        worker.process(event)
+      const matches = worker.match(event)
+      if(matches.length > 0){
+        worker.process(event, matches)
         processed++
       }
     });
@@ -100,14 +108,56 @@ export class Workers {
   }
 
   install(event: EventReference): void {
-    logger.info(event)
 
     // get install event
-    /*
-      Events.get(event.id).then( (item) => {
-        console.log(item.data)
-      })
-    */
+    Events.get(event).then(async (item) => {
+
+      const evt = JSON.parse(item)
+      const tplTs = Deno.readTextFileSync("./index.ts.tpl");
+
+      const response = Deno.readTextFileSync(evt.url);
+      const buildFolder = `${this.builderPath}/${evt.id}`
+      const mainFile = `${buildFolder}/index.js`
+      const indexFile = `${buildFolder}/${evt.id}.js`
+      ensureDirSync(buildFolder)
+      Deno.writeTextFileSync(indexFile, response);
+      Deno.writeTextFileSync(mainFile, tplTs.replaceAll("[eventId]",`${evt.id}`));
+
+      const p = Deno.run({
+        cmd: ["deno" , "run", mainFile],
+        stdout: "piped",
+        stderr: "piped",
+      });
+      
+      const { code } = await p.status();
+
+      if (code === 0) {
+        const rawOutput = await p.output();
+        await Deno.stdout.write(rawOutput);
+        
+        try {
+
+          let process = this.getProcess(evt.id)
+          if (!process) {
+            process = new BaseWorker(evt.id, mainFile)
+          }
+
+          process.run()
+
+          this.addProcess(evt.id, process)
+          
+        } catch (error) {
+          logger.error(error)
+        }
+
+      } else {
+        const rawError = await p.stderrOutput();
+        const errorString = new TextDecoder().decode(rawError);
+        logger.info(errorString);
+      }
+
+    })
+
     return 
   }
 

@@ -6,6 +6,6 @@ import (
 
 var nsqEventCmd = &cobra.Command{
 	Use:   "nsqEvent",
-	Short: "Start a event listener for nsqEvent",
+	Short: "Start an event listener for nsqEvent",
 	Run:   func(cmd *cobra.Command, args []string) {},
 }

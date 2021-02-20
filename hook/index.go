@@ -12,6 +12,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/dwellersclub/contigus/hook/generic"
 	github "github.com/dwellersclub/contigus/hook/github"
 	slack "github.com/dwellersclub/contigus/hook/slack"
 	"github.com/dwellersclub/contigus/models"
@@ -283,6 +284,8 @@ func NewHookFromConfig(config models.HookConfig) Hook {
 		reader = github.Read
 	case "slack":
 		reader = slack.Read
+	case "generic":
+		reader = generic.Read
 	}
 
 	options := models.HookOption{}

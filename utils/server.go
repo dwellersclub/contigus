@@ -42,9 +42,9 @@ type ServerConfig struct {
 
 //HookServerConfig Server config for hooks
 type HookServerConfig struct {
-	ServerConfig
+	*ServerConfig
 	IDs         string `env:"HOOK_IDS"`
-	Context     string `env:"HOOK_CTX"`
+	Context     string `env:"HOOK_CTX" envDefault:"/hooks"`
 	ConfigPath  string `env:"HOOK_CONFIG_PATH" envDefault:"../tower/config"`
 	RefreshFreq int64  `env:"HOOK_REFRESH_FREQ" envDefault:"60"`
 }

@@ -35,23 +35,6 @@ func main() {
 
 	dbURL := utils.GetDBUrl(config.DBURL, config.DBUsername, config.DBPassword, appName)
 
-	migrator, err := utils.NewMigrator([]string{
-		"./migration",
-		"./tower/migration",
-		"./cmd/tower/migration",
-	}, dbURL)
-
-	if err != nil {
-		log.WithError(err).Errorf("Can't start migrator with url [%s]", config.DBURL)
-		os.Exit(1)
-	}
-
-	err = migrator.Migrate()
-	if err != nil {
-		log.WithError(err).Errorf("Can't start migrator with url [%s]", config.DBURL)
-		os.Exit(1)
-	}
-
 	//TODO: make it configurable
 	hookConfig := models.HookConfig{
 		URLContext: "/hooks",
@@ -60,7 +43,7 @@ func main() {
 	encryptor := hook.NewEncryptor()
 	metrics := hook.NewHookMetrics()
 
-	service := hook.NewService(metrics, encryptor, "")
+	service := hook.NewService(metrics, encryptor, "", nil)
 
 	router := tower.NewRouter(log, service, hookConfig)
 
